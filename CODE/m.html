@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microsoft Authentication</title>
+    <style>
+        /* Simple styles for the page */
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding-top: 50px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #userInfo {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@2.27.0/dist/msal-browser.min.js"></script>
+</head>
+<body>
+    <h2>Login with Microsoft</h2>
+    <button id="loginButton">Login with Microsoft</button>
+    <div id="userInfo" style="display:none;">
+        <h3>User Info:</h3>
+        <p id="name"></p>
+        <p id="email"></p>
+    </div>
+
+    <script>
+        // Configuration object for MSAL
+        const msalConfig = {
+            auth: {
+                clientId: "0576bdfb-a5fd-4132-8a35-d7e53f800e8d",  // Replace with your Client ID
+                authority: "7b887c76-d8d8-4448-9bf5-a51820345eb4",  // Replace with your Tenant ID
+                redirectUri: window.location.href  // Redirect URI after authentication
+            }
+        };
+
+        // Create MSAL instance
+        const msalInstance = new msal.PublicClientApplication(msalConfig);
+
+        // Handle login button click
+        document.getElementById('loginButton').addEventListener('click', function() {
+            const loginRequest = {
+                scopes: ["user.read"] // Permissions to access user profile
+            };
+
+            // Login with popup
+            msalInstance.loginPopup(loginRequest)
+                .then(response => {
+                    // Authentication successful
+                    console.log(response);
+                    document.getElementById('userInfo').style.display = 'block';
+                    document.getElementById('name').textContent = `Name: ${response.account.name}`;
+                    document.getElementById('email').textContent = `Email: ${response.account.username}`;
+                })
+                .catch(error => {
+                    console.error(error);
+                    alert("Login failed");
+                });
+        });
+    </script>
+</body>
+</html>

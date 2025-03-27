@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Google Login</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 50px;
+    }
+    h2 {
+      margin-bottom: 20px;
+    }
+    #google-signin-button {
+      margin-top: 20px;
+    }
+    .message {
+      margin-top: 30px;
+      font-size: 18px;
+    }
+  </style>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+  <h2>Login with Google</h2>
+  
+  <!-- Google Sign-In Button -->
+  <div id="google-signin-button"></div>
+
+  <div class="message" id="message"></div>
+
+  <script>
+    // Callback function that runs after a user logs in
+    function handleCredentialResponse(response) {
+      console.log("Encoded JWT ID token: " + response.credential);
+
+      // Send this JWT token to your backend server for further verification if needed
+      document.getElementById('message').innerHTML = "Authentication successful! User info will be sent to the server.";
+      
+      // You can also parse the JWT and get user details directly, if needed:
+      // For example, if you want to display the user's email
+      const token = response.credential;
+      const payload = parseJwt(token);
+      console.log(payload);  // Prints the decoded JWT payload with user info like email, name, etc.
+    }
+
+    // Function to parse JWT token and get user info
+    function parseJwt(token) {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+
+      return JSON.parse(jsonPayload);
+    }
+
+    // Initialize the Google Sign-In API and render the button
+    window.onload = function() {
+      google.accounts.id.initialize({
+        client_id: "138786390929-3c2mki82mf6sv960a3hn973t0flej5pq.apps.googleusercontent.com",  // Replace with your Google Client ID
+        callback: handleCredentialResponse
+      });
+
+      google.accounts.id.renderButton(
+        document.getElementById("google-signin-button"), 
+        { theme: "outline", size: "large" }  // Customize the button style
+      );
+    };
+  </script>
+</body>
+</html>
